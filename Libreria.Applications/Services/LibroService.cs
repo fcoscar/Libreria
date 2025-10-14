@@ -48,19 +48,6 @@ public class LibroService : ILibroService
 
     public async Task<GetLibroDto> CrearLibroAsync(PostLibroDto dto)
     {
-
-            var autorExiste = await _autorRepository.GetByIdAsync(dto.AutorId);
-            if (autorExiste == null)
-            {
-                throw new InvalidOperationException($"El autor con ID {dto.AutorId} no existe");
-            }
-
-            var tituloExiste = await _libroRepository.GetLibroByNombreAsync(dto.Titulo);
-            if (tituloExiste != null)
-            {
-                throw new InvalidOperationException($"Ya exite un libro con el titulo: {dto.Titulo}");
-            }
-            
             var libro = new Libros
             {
                 Titulo = dto.Titulo,
@@ -78,7 +65,6 @@ public class LibroService : ILibroService
                 AnoPublicacion = libro.AnoPublicacion
             };
             return newDto;
-
     }
 
     public async Task<List<GetLibroDto>> BusquedaAvanzadaAsync(BusquedaAvanzadaDto filtros)

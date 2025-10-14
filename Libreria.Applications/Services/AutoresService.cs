@@ -39,12 +39,6 @@ public class AutoresService : IAutoresService
 
     public async Task<AutorDto> CrearAutorAsync(CrearAutorDto dto)
     {
-        var autorExistente = await _autorRepository.GetByNombreAsync(dto.Nombre);
-        if (autorExistente != null)
-        {
-            throw new InvalidOperationException($"Ya existe un autor con el nombre {dto.Nombre}");
-        }
-        
         var autor = new Autores()
         {
             Nombre = dto.Nombre,

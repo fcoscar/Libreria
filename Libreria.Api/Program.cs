@@ -1,10 +1,12 @@
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
+using FluentValidation;
 using Libreria.Api;
 using Libreria.Applications.Interfaces.Repositories;
 using Libreria.Applications.Interfaces.Services;
 using Libreria.Applications.Services;
+using Libreria.Applications.Validators;
 using Libreria.Infrastructure;
 using Libreria.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,6 +21,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddControllers();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CrearAutorValidator>(); 
+builder.Services.AddValidatorsFromAssemblyContaining<CrearLibroValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CrearPrestamoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CrearUsuarioValidator>();
+
 builder.Services.AddDbContext<MainDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),

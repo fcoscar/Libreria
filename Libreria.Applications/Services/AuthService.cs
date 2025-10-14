@@ -41,15 +41,6 @@ public class AuthService : IAuthService
 
     public async Task<bool> RegisterAsync(AuthDto.RegisterDto dto)
     {
-        var existeUsuario = await _usuarioRepository.GetByNombreUsuarioAsync(dto.Username);
-
-        if (existeUsuario != null) return false;
-
-        if (dto.Role != "Admin" && dto.Role != "User")
-        {
-            throw new InvalidOperationException("Rol inválido. Use 'Admin' o 'User'");
-        }
-
         var usuario = new Usuario
         {
             NombreUsuario = dto.Username,

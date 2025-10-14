@@ -83,4 +83,10 @@ public class LibroRespository : Repository<Libros>, ILibroRepository
             
         return items;
     }
+
+    public async Task<bool> ExisteLibroPorTituloAutorAsync(string titulo, int autor)
+    {
+        var libro = await _dbSet.Where(l => l.Titulo == titulo && l.AutorId == autor).FirstOrDefaultAsync();
+        return libro != null;
+    }
 }
