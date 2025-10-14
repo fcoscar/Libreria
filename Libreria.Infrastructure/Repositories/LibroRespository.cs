@@ -20,7 +20,7 @@ public class LibroRespository : Repository<Libros>, ILibroRepository
             {
                 Id = l.Id,
                 Titulo = l.Titulo,
-                AñoPublicacion = l.AnoPublicacion
+                AnoPublicacion = l.AnoPublicacion
             })
             .ToListAsync();
     }

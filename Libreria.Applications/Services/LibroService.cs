@@ -24,7 +24,7 @@ public class LibroService : ILibroService
         {
             Id = l.Id,
             Titulo = l.Titulo,
-            AñoPublicacion = l.AnoPublicacion
+            AnoPublicacion = l.AnoPublicacion
         }).ToList();
     }
 
@@ -36,7 +36,7 @@ public class LibroService : ILibroService
         {
             Id = libro.Id,
             Titulo = libro.Titulo,
-            AñoPublicacion = libro.AnoPublicacion
+            AnoPublicacion = libro.AnoPublicacion
         };
     }
 
@@ -75,7 +75,7 @@ public class LibroService : ILibroService
             {
                 Id = libro.Id,
                 Titulo = libro.Titulo,
-                AñoPublicacion = libro.AnoPublicacion
+                AnoPublicacion = libro.AnoPublicacion
             };
             return newDto;
 

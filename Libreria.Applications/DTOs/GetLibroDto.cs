@@ -4,5 +4,5 @@ public class GetLibroDto
 {
     public int Id { get; set; }
     public string Titulo { get; set; } = string.Empty;
-    public int AñoPublicacion { get; set; }
+    public int AnoPublicacion { get; set; }
 }
