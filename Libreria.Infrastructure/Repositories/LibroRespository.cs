@@ -24,4 +24,9 @@ public class LibroRespository : Repository<Libros>, ILibroRepository
             })
             .ToListAsync();
     }
+
+    public async Task<Libros?> GetLibroByNombreAsync(string titulo)
+    {
+        return await _dbSet.Where(l => l.Titulo == titulo).FirstOrDefaultAsync();
+    }
 }

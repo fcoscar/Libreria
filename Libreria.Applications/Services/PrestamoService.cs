@@ -1,16 +1,18 @@
 using Libreria.Applications.DTOs;
 using Libreria.Applications.Interfaces.Repositories;
 using Libreria.Applications.Interfaces.Services;
+using Libreria.Domain.Entidades;
 
 namespace Libreria.Applications.Services;
 
 public class PrestamoService : IPrestamoService
 {
     private readonly IPrestamoRepository _prestamoRepository;
-
-    public PrestamoService(IPrestamoRepository prestamoRepository)
+    private readonly ILibroRepository _libroRepository;
+    public PrestamoService(IPrestamoRepository prestamoRepository, ILibroRepository libroRepository)
     {
         _prestamoRepository = prestamoRepository;
+        _libroRepository = libroRepository;
     }
 
     public async Task<List<GetPrestamoDto>> GetPrestamosNoDevueltosAsync()
@@ -33,6 +35,7 @@ public class PrestamoService : IPrestamoService
         if (prestamo == null) return null;
         return new GetPrestamoDto()
         {
+            Id = prestamo.Id,
             AutorId = prestamo.Libro.AutorId,
             LibroId = prestamo.LibroId,
             Nombre = prestamo.Libro.Autor.Nombre,
@@ -53,5 +56,47 @@ public class PrestamoService : IPrestamoService
         await _prestamoRepository.UpdateAsync(prestamo);
         await _prestamoRepository.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<GetPrestamoDto> CrearPrestamoAsync(PostPrestamoDto dto)
+    {
+        var libroExiste = await _libroRepository.GetByIdAsync(dto.LibroId);
+        if (libroExiste == null)
+        {
+            throw new InvalidOperationException($"El libro con ID {dto.LibroId} no existe");
+        }
+
+        var prestamoExistente = await _prestamoRepository.GetPrestamoByLibroIdAsync(dto.LibroId);
+        if (prestamoExistente != null)
+        {
+            throw new InvalidOperationException($"El libro con ID {dto.LibroId} ya esta prestado");
+        }
+        
+        var prestamo = new Prestamos
+        {
+            LibroId = dto.LibroId,
+            FechaPrestamo = dto.FechaPrestamo,
+            FechaDevolucion = null
+        };
+
+        await _prestamoRepository.AddAsync(prestamo);
+        await _prestamoRepository.SaveChangesAsync();
+
+
+        return await GetPrestamoByIdAsync(prestamo.Id)
+               ?? throw new InvalidOperationException("Error al crear el préstamo");
+    }
+
+    public async Task<List<GetPrestamoDto>> GetTodosPrestamosAsync()
+    {
+        var prestamos = await _prestamoRepository.GetPrestamosNoDevueltosAsync();
+        return prestamos.Select(p => new GetPrestamoDto
+        {
+            Id = p.Id,
+            AutorId = p.AutorId,
+            LibroId = p.LibroId,
+            Nombre = p.Nombre,
+            Titulo = p.Titulo,
+        }).ToList();
     }
 }

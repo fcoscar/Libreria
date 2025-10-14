@@ -17,6 +17,29 @@ public class LibroService : ILibroService
         _autorRepository = autorRepository;
     }
 
+    public async Task<List<GetLibroDto>> GetTodosLibrosAsync()
+    {
+        var libros = await _libroRepository.GetAllAsync();
+        return libros.Select(l => new GetLibroDto
+        {
+            Id = l.Id,
+            Titulo = l.Titulo,
+            AñoPublicacion = l.AnoPublicacion
+        }).ToList();
+    }
+
+    public async Task<GetLibroDto?> GetLibroPorIdAsync(int id)
+    {
+        var libro = await _libroRepository.GetByIdAsync(id);
+        if (libro == null) return null;
+        return new GetLibroDto()
+        {
+            Id = libro.Id,
+            Titulo = libro.Titulo,
+            AñoPublicacion = libro.AnoPublicacion
+        };
+    }
+
     public async Task<List<GetLibroDto>> GetLibrosAntesDe2000Async()
     {
         var libros = await _libroRepository.GetLibrosAntesDe2000Async();
@@ -25,14 +48,19 @@ public class LibroService : ILibroService
 
     public async Task<GetLibroDto> CrearLibroAsync(PostLibroDto dto)
     {
-        try
-        {
+
             var autorExiste = await _autorRepository.GetByIdAsync(dto.AutorId);
             if (autorExiste == null)
             {
                 throw new InvalidOperationException($"El autor con ID {dto.AutorId} no existe");
             }
 
+            var tituloExiste = await _libroRepository.GetLibroByNombreAsync(dto.Titulo);
+            if (tituloExiste != null)
+            {
+                throw new InvalidOperationException($"Ya exite un libro con el titulo: {dto.Titulo}");
+            }
+            
             var libro = new Libros
             {
                 Titulo = dto.Titulo,
@@ -43,20 +71,13 @@ public class LibroService : ILibroService
 
             await _libroRepository.AddAsync(libro);
             await _libroRepository.SaveChangesAsync();
-            var newLibro = await _libroRepository.GetByIdAsync(libro.Id);
             var newDto = new GetLibroDto
             {
-                Id = newLibro.Id,
-                Titulo = newLibro.Titulo,
-                AñoPublicacion = newLibro.AnoPublicacion
+                Id = libro.Id,
+                Titulo = libro.Titulo,
+                AñoPublicacion = libro.AnoPublicacion
             };
-        
             return newDto;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+
     }
 }

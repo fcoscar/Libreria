@@ -8,4 +8,6 @@ public interface IPrestamoService
     Task<bool> EliminarPrestamoAsync(int id);
     Task<GetPrestamoDto?> GetPrestamoByIdAsync(int id);
     Task<bool> ActualizarFechaDevPrestamoAsync(int id, ActualizarFechaDevDto dto);
+    Task<GetPrestamoDto> CrearPrestamoAsync(PostPrestamoDto dto);
+    Task<List<GetPrestamoDto>> GetTodosPrestamosAsync();
 }

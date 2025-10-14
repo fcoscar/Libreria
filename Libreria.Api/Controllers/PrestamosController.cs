@@ -124,4 +124,53 @@ public class PrestamosController : ControllerBase
                 "Error al procesar la solicitud"));
         }
     }
+    
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(ApiResponse<PostPrestamoDto>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<ApiResponse<PostPrestamoDto>>> CrearPrestamo(
+        [FromBody] PostPrestamoDto dto)
+    {
+        try
+        {
+            var prestamo = await _prestamoService.CrearPrestamoAsync(dto);
+            _logger.LogInformation("Préstamo creado con ID {PrestamoId}", prestamo.Id);
+            
+            return CreatedAtAction(
+                nameof(GetPrestamoPorId), 
+                new { id = prestamo.Id }, 
+                ApiResponse<GetPrestamoDto>.SuccessResponse(
+                    prestamo, "Préstamo creado exitosamente"));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al crear préstamo");
+            return StatusCode(500, ApiResponse<object>.ErrorResponse(
+                "Error al procesar la solicitud"));
+        }
+    }
+    
+    [HttpGet]
+    [ProducesResponseType(typeof(ApiResponse<List<GetPrestamoDto>>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse<List<GetPrestamoDto>>>> GetTodosPrestamos()
+    {
+        try
+        {
+            var prestamos = await _prestamoService.GetTodosPrestamosAsync();
+            return Ok(ApiResponse<List<GetPrestamoDto>>.SuccessResponse(prestamos));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al obtener todos los préstamos");
+            return StatusCode(500, ApiResponse<object>.ErrorResponse(
+                "Error al procesar la solicitud"));
+        }
+    }
 }

@@ -20,6 +20,46 @@ public class LibrosController : ControllerBase
         _logger = logger;
     }
 
+    [HttpGet]
+    [ProducesResponseType(typeof(ApiResponse<List<GetLibroDto>>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse<List<GetLibroDto>>>> GetTodosLibros()
+    {
+        try
+        {
+            var libros = await _libroService.GetTodosLibrosAsync();
+            return Ok(ApiResponse<List<GetLibroDto>>.SuccessResponse(libros));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al obtener todos los libros");
+            return StatusCode(500, ApiResponse<object>.ErrorResponse(
+                "Error al procesar la solicitud"));
+        }
+    }
+    
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(ApiResponse<GetLibroDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ApiResponse<GetLibroDto>>> GetLibroPorId(int id)
+    {
+        try
+        {
+            var libro = await _libroService.GetLibroPorIdAsync(id);
+            if (libro == null)
+            {
+                return NotFound(ApiResponse<object>.ErrorResponse(
+                    $"Libro con ID {id} no encontrado"));
+            }
+            return Ok(ApiResponse<GetLibroDto>.SuccessResponse(libro));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al obtener libro con ID {LibroId}", id);
+            return StatusCode(500, ApiResponse<object>.ErrorResponse(
+                "Error al procesar la solicitud"));
+        }
+    }
+    
     [HttpGet("antes-de-2000")]
     [ProducesResponseType(typeof(ApiResponse<List<GetLibroDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]

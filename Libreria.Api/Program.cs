@@ -1,9 +1,14 @@
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using Libreria.Api;
+using Libreria.Applications.Interfaces.Repositories;
 using Libreria.Applications.Interfaces.Services;
 using Libreria.Applications.Services;
+using Libreria.Infrastructure;
+using Libreria.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -23,6 +28,12 @@ builder.Services.AddDbContext<MainDbContext>(options =>
             errorNumbersToAdd: null
         )
     ));
+
+
+builder.Services.AddScoped<ILibroRepository, LibroRespository>();
+builder.Services.AddScoped<IPrestamoRepository, PrestamoRepository>();
+builder.Services.AddScoped<IAutorRepository, AutorRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
 builder.Services.AddScoped<ILibroService, LibroService>();
 builder.Services.AddScoped<IPrestamoService, PrestamoService>();
@@ -50,7 +61,8 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ClockSkew = TimeSpan.Zero // Sin margen de tolerancia para expiración
+        ClockSkew = TimeSpan.Zero,
+        RoleClaimType = ClaimTypes.Role 
     };
 
     options.Events = new JwtBearerEvents
@@ -83,14 +95,9 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Library Management API",
+        Title = "Libreria API",
         Version = "v1",
         Description = "API REST para gestión de librería con operaciones CRUD sobre Autores, Libros y Préstamos",
-        Contact = new OpenApiContact
-        {
-            Name = "API Support",
-            Email = "support@library.com"
-        }
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -134,12 +141,43 @@ builder.Logging.AddDebug();
 
 var app = builder.Build();
 
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        
+        var error = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+        if (error != null)
+        {
+            var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+            logger.LogError(error.Error, "Error no manejado");
+            
+            await context.Response.WriteAsJsonAsync(new
+            {
+                success = false,
+                message = "Ocurrió un error interno en el servidor",
+                errors = new[] { error.Error.Message }
+            });
+        }
+    });
+});
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 
+app.UseCors("AllowAll");
+
+app.UseAuthentication();
+
+app.UseAuthorization();
+
+app.MapControllers();
 app.Run();

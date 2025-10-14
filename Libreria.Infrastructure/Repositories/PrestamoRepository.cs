@@ -23,4 +23,17 @@ public class PrestamoRepository : Repository<Prestamos>, IPrestamoRepository
             })
             .ToListAsync();
     }
+
+    public async Task<GetPrestamoDto?> GetPrestamoByLibroIdAsync(int id)
+    {
+        return await _dbSet.Where(p => p.LibroId == id)
+            .Select(p => new GetPrestamoDto()
+            {
+                AutorId = p.Libro.AutorId,
+                Nombre = p.Libro.Autor.Nombre,
+                Titulo = p.Libro.Titulo,
+                LibroId = p.LibroId,
+            })
+            .FirstOrDefaultAsync();
+    }
 }

@@ -1,0 +1,4 @@
+migrations command
+dotnet ef migrations add Initial --project Libreria.Infrastructure --startup-project Libreria.Api
+dotnet ef database update --project Libreria.Infrastructure --startup-project Libreria.Api
+dotnet ef migrations remove --project Libreria.Infrastructure --startup-project Libreria.Api

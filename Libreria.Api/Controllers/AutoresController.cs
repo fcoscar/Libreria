@@ -58,7 +58,6 @@ public class AutoresController : ControllerBase
         }
     }
     [HttpPost]
-    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(ApiResponse<AutorDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
