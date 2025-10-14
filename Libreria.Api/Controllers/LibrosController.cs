@@ -95,7 +95,7 @@ public class LibrosController : ControllerBase
             _logger.LogInformation("Libro creado con ID {LibroId}", libro.Id);
             
             return CreatedAtAction(
-                nameof(GetLibroDto), 
+                nameof(GetLibroPorId), 
                 new { id = libro.Id }, 
                 ApiResponse<GetLibroDto>.SuccessResponse(libro, "Libro creado exitosamente"));
         }
