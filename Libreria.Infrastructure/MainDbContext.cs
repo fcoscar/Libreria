@@ -1,3 +1,4 @@
+using Libreria.Applications.Interfaces;
 using Libreria.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 
@@ -5,10 +6,7 @@ namespace Libreria.Infrastructure;
 
 public class MainDbContext : DbContext
 {
-    public DbSet<Autores> Autores { get; set; }
-    public DbSet<Libros> Libros { get; set; }
-    public DbSet<Prestamos> Prestamos { get; set; }
-    public DbSet<Usuario> Usuarios { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -74,4 +72,9 @@ public class MainDbContext : DbContext
 
         });
     }
+
+    public DbSet<Autores> Autores { get; set; }
+    public DbSet<Libros> Libros { get; set; }
+    public DbSet<Prestamos> Prestamos { get; set; }
+    public DbSet<Usuario> Usuarios { get; set; }
 }

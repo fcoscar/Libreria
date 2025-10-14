@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Libreria.Applications\Libreria.Applications.csproj" />
       <ProjectReference Include="..\Libreria.Domain\Libreria.Domain.csproj" />
     </ItemGroup>
 
