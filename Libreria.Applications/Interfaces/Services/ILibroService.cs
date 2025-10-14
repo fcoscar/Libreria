@@ -8,4 +8,5 @@ public interface ILibroService
     Task<GetLibroDto?> GetLibroPorIdAsync(int id);
     Task<List<GetLibroDto>> GetLibrosAntesDe2000Async();
     Task<GetLibroDto> CrearLibroAsync(PostLibroDto dto);
+    Task<List<GetLibroDto>> BusquedaAvanzadaAsync (BusquedaAvanzadaDto filtros);
 }

@@ -111,4 +111,38 @@ public class LibrosController : ControllerBase
                 "Error al procesar la solicitud"));
         }
     }
+    
+    [HttpGet("busqueda-avanzada")]
+    [ProducesResponseType(typeof(ApiResponse<List<GetLibroDto>>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse<List<GetLibroDto>>>> BusquedaAvanzada([FromQuery] BusquedaAvanzadaDto filtros)
+    {
+        try
+        {
+            var resultado = await _libroService.BusquedaAvanzadaAsync(filtros);
+            return Ok(ApiResponse<List<GetLibroDto>>.SuccessResponse(resultado));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error en búsqueda de libros por filtros");
+            return StatusCode(500, ApiResponse<object>.ErrorResponse(
+                "Error al procesar la solicitud"));
+        }
+    }
+    
+    [HttpGet("populares")]
+    [ProducesResponseType(typeof(ApiResponse<List<GetLibroDto>>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse<List<GetLibroDto>>>> LibrosPopulares([FromQuery] BusquedaAvanzadaDto filtros)
+    {
+        try
+        {
+            var resultado = await _libroService.BusquedaAvanzadaAsync(filtros);
+            return Ok(ApiResponse<List<GetLibroDto>>.SuccessResponse(resultado));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error en búsqueda de libros por filtros");
+            return StatusCode(500, ApiResponse<object>.ErrorResponse(
+                "Error al procesar la solicitud"));
+        }
+    }
 }

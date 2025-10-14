@@ -7,4 +7,5 @@ public interface ILibroRepository : IRepository<Libros>
 {
     Task<List<GetLibroDto>> GetLibrosAntesDe2000Async();
     Task<Libros?> GetLibroByNombreAsync(string titulo);
+    Task<List<GetLibroDto>> BusquedaAvanzadaAsync(BusquedaAvanzadaDto filtros);
 }

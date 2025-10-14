@@ -80,4 +80,9 @@ public class LibroService : ILibroService
             return newDto;
 
     }
+
+    public async Task<List<GetLibroDto>> BusquedaAvanzadaAsync(BusquedaAvanzadaDto filtros)
+    {
+        return await _libroRepository.BusquedaAvanzadaAsync(filtros);
+    }
 }
