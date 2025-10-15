@@ -9,5 +9,7 @@ public class Prestamos
     public int LibroId { get; set; }
     public DateTime FechaPrestamo { get; set; }
     public DateTime? FechaDevolucion { get; set; }
-    public Libros Libro { get; set; }
+    public virtual Libros Libro { get; set; }
+    
+    
 }

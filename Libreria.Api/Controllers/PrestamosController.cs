@@ -97,9 +97,7 @@ public class PrestamosController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> ActualizarPrestamo(
-        int id, 
-        [FromBody] ActualizarFechaDevDto dto)
+    public async Task<IActionResult> ActualizarPrestamo(int id, [FromBody] ActualizarFechaDevDto dto)
     {
         try
         {

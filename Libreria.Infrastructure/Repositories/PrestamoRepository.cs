@@ -16,6 +16,7 @@ public class PrestamoRepository : Repository<Prestamos>, IPrestamoRepository
         return await _dbSet.Where(p => p.FechaDevolucion == null)
             .Select(p => new GetPrestamoDto()
             {
+                Id = p.Id,
                 AutorId = p.Libro.AutorId,
                 Nombre= p.Libro.Autor.Nombre,
                 Titulo = p.Libro.Titulo,
@@ -26,7 +27,7 @@ public class PrestamoRepository : Repository<Prestamos>, IPrestamoRepository
 
     public async Task<GetPrestamoDto?> GetPrestamoByLibroIdAsync(int id)
     {
-        return await _dbSet.Where(p => p.LibroId == id)
+        return await _dbSet.Where(p => p.LibroId == id && p.FechaDevolucion == null)
             .Select(p => new GetPrestamoDto()
             {
                 AutorId = p.Libro.AutorId,

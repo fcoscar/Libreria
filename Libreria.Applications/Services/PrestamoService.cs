@@ -1,3 +1,4 @@
+using FluentValidation;
 using Libreria.Applications.DTOs;
 using Libreria.Applications.Interfaces.Repositories;
 using Libreria.Applications.Interfaces.Services;
@@ -9,10 +10,12 @@ public class PrestamoService : IPrestamoService
 {
     private readonly IPrestamoRepository _prestamoRepository;
     private readonly ILibroRepository _libroRepository;
-    public PrestamoService(IPrestamoRepository prestamoRepository, ILibroRepository libroRepository)
+    private readonly IValidator<PostPrestamoDto> _validator;
+    public PrestamoService(IPrestamoRepository prestamoRepository, ILibroRepository libroRepository, IValidator<PostPrestamoDto> validator)
     {
         _prestamoRepository = prestamoRepository;
         _libroRepository = libroRepository;
+        _validator = validator;
     }
 
     public async Task<List<GetPrestamoDto>> GetPrestamosNoDevueltosAsync()
@@ -60,6 +63,14 @@ public class PrestamoService : IPrestamoService
 
     public async Task<GetPrestamoDto> CrearPrestamoAsync(PostPrestamoDto dto)
     {
+        
+        var result  = await _validator.ValidateAsync(dto);
+        if (!result.IsValid)
+        {
+            var errors = string.Join("; ", result.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}"));
+            throw new InvalidOperationException(errors);
+        }
+        
         var libroExiste = await _libroRepository.GetByIdAsync(dto.LibroId);
         if (libroExiste == null)
         {
@@ -89,14 +100,14 @@ public class PrestamoService : IPrestamoService
 
     public async Task<List<GetPrestamoDto>> GetTodosPrestamosAsync()
     {
-        var prestamos = await _prestamoRepository.GetPrestamosNoDevueltosAsync();
+        var prestamos = await _prestamoRepository.GetAllAsync();
         return prestamos.Select(p => new GetPrestamoDto
         {
             Id = p.Id,
-            AutorId = p.AutorId,
+            AutorId = p.Libro.AutorId,
             LibroId = p.LibroId,
-            Nombre = p.Nombre,
-            Titulo = p.Titulo,
+            Nombre = p.Libro.Autor.Nombre,
+            Titulo = p.Libro.Titulo,
         }).ToList();
     }
 }

@@ -1,3 +1,4 @@
+using FluentValidation;
 using Libreria.Applications.DTOs;
 using Libreria.Applications.Interfaces.Repositories;
 using Libreria.Applications.Interfaces.Services;
@@ -8,10 +9,11 @@ namespace Libreria.Applications.Services;
 public class AutoresService : IAutoresService
 {
     private readonly IAutorRepository _autorRepository;
-
-    public AutoresService(IAutorRepository autorRepository)
+    private readonly IValidator<CrearAutorDto> _validator;
+    public AutoresService(IAutorRepository autorRepository, IValidator<CrearAutorDto> validator)
     {
         _autorRepository = autorRepository;
+        _validator = validator;
     }
     
     public async Task<List<AutorDto>> GetTodosAutoresAsync()
@@ -39,6 +41,13 @@ public class AutoresService : IAutoresService
 
     public async Task<AutorDto> CrearAutorAsync(CrearAutorDto dto)
     {
+        var result  = await _validator.ValidateAsync(dto);
+        if (!result.IsValid)
+        {
+            var errors = string.Join("; ", result.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}"));
+            throw new InvalidOperationException(errors);
+        }
+        
         var autor = new Autores()
         {
             Nombre = dto.Nombre,

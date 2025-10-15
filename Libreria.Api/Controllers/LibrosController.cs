@@ -118,6 +118,7 @@ public class LibrosController : ControllerBase
     {
         try
         {
+            filtros.Popurales = false;
             var resultado = await _libroService.BusquedaAvanzadaAsync(filtros);
             return Ok(ApiResponse<List<GetLibroDto>>.SuccessResponse(resultado));
         }
@@ -135,12 +136,75 @@ public class LibrosController : ControllerBase
     {
         try
         {
+            filtros.Popurales = true;
             var resultado = await _libroService.BusquedaAvanzadaAsync(filtros);
             return Ok(ApiResponse<List<GetLibroDto>>.SuccessResponse(resultado));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error en búsqueda de libros por filtros");
+            return StatusCode(500, ApiResponse<object>.ErrorResponse(
+                "Error al procesar la solicitud"));
+        }
+    }
+    
+    
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> EliminarLibro(int id)
+    {
+        try
+        {
+            var eliminado = await _libroService.EliminarLibroAsync(id);
+            if (!eliminado)
+            {
+                return NotFound(ApiResponse<object>.ErrorResponse(
+                    $"Libro con ID {id} no encontrado"));
+            }
+            
+            _logger.LogInformation("Libro eliminado con ID {LibroId}", id);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al eliminar libro con ID {LibroId}", id);
+            return StatusCode(500, ApiResponse<object>.ErrorResponse(
+                "Error al procesar la solicitud"));
+        }
+    }
+    
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> ActualizarLibro(int id, [FromBody] PutLibroDto dto)
+    {
+        try
+        {
+            var actualizado = await _libroService.ActualizarFLibroAsync(id, dto);
+            if (!actualizado)
+            {
+                return NotFound(ApiResponse<object>.ErrorResponse(
+                    $"libro con ID {id} no encontrado"));
+            }
+            
+            _logger.LogInformation("Préstamo libro con ID {LibroId}", id);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al actualizar libro con ID {LibroId}", id);
             return StatusCode(500, ApiResponse<object>.ErrorResponse(
                 "Error al procesar la solicitud"));
         }

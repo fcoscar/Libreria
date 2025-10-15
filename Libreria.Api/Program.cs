@@ -22,11 +22,6 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddControllers();
 
-builder.Services.AddValidatorsFromAssemblyContaining<CrearAutorValidator>(); 
-builder.Services.AddValidatorsFromAssemblyContaining<CrearLibroValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<CrearPrestamoValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<CrearUsuarioValidator>();
-
 builder.Services.AddDbContext<MainDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -35,13 +30,18 @@ builder.Services.AddDbContext<MainDbContext>(options =>
             maxRetryDelay: TimeSpan.FromSeconds(30),
             errorNumbersToAdd: null
         )
-    ));
+    ).UseLazyLoadingProxies());
 
 
 builder.Services.AddScoped<ILibroRepository, LibroRespository>();
 builder.Services.AddScoped<IPrestamoRepository, PrestamoRepository>();
 builder.Services.AddScoped<IAutorRepository, AutorRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CrearAutorValidator>(); 
+builder.Services.AddValidatorsFromAssemblyContaining<CrearLibroValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CrearPrestamoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CrearUsuarioValidator>();
 
 builder.Services.AddScoped<ILibroService, LibroService>();
 builder.Services.AddScoped<IPrestamoService, PrestamoService>();

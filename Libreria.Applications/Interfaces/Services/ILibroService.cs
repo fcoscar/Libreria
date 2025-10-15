@@ -9,4 +9,6 @@ public interface ILibroService
     Task<List<GetLibroDto>> GetLibrosAntesDe2000Async();
     Task<GetLibroDto> CrearLibroAsync(PostLibroDto dto);
     Task<List<GetLibroDto>> BusquedaAvanzadaAsync (BusquedaAvanzadaDto filtros);
+    Task<bool> EliminarLibroAsync(int id);
+    Task<bool> ActualizarFLibroAsync(int id, PutLibroDto dto);
 }

@@ -1,3 +1,4 @@
+using FluentValidation;
 using Libreria.Applications.DTOs;
 using Libreria.Applications.Interfaces.Repositories;
 using Libreria.Applications.Interfaces.Services;
@@ -10,10 +11,12 @@ public class AuthService : IAuthService
 {
     private readonly ITokenService _tokenService;
     private readonly IUsuarioRepository _usuarioRepository;
-    public AuthService(ITokenService tokenService, IUsuarioRepository usuarioRepository)
+    private readonly IValidator<AuthDto.RegisterDto> _validator;
+    public AuthService(ITokenService tokenService, IUsuarioRepository usuarioRepository, IValidator<AuthDto.RegisterDto> validator)
     {
         _tokenService = tokenService;
         _usuarioRepository = usuarioRepository;
+        _validator = validator;
     }
 
     public async Task<AuthDto.LoginResponseDto?> LoginAsync(AuthDto.LoginDto dto)
@@ -41,6 +44,12 @@ public class AuthService : IAuthService
 
     public async Task<bool> RegisterAsync(AuthDto.RegisterDto dto)
     {
+        var result  = await _validator.ValidateAsync(dto);
+        if (!result.IsValid)
+        {
+            var errors = string.Join("; ", result.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}"));
+            throw new InvalidOperationException(errors);
+        }
         var usuario = new Usuario
         {
             NombreUsuario = dto.Username,
